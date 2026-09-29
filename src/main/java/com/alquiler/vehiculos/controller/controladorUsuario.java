@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alquiler.vehiculos.entidad.Usuarios;
 import com.alquiler.vehiculos.repositorio.usuario;
 
+
 @RestController
 @RequestMapping("/usuarios/u")
 @CrossOrigin(origins = "http://localhost:4200/")
@@ -51,6 +52,18 @@ public class controladorUsuario {
 	    u.setFechaRegistro(LocalDateTime.now());
 
 	    repoUsuario.save(u);
+	    return ResponseEntity.ok(u);
+	}
+	
+	@GetMapping("/login/")
+	public ResponseEntity<?> login(@RequestParam("identificacion") String identificacion, @RequestParam("contrasena") String contrasena) {
+	    
+	    Usuarios u = repoUsuario.findByIdentificacionAndContrasena(identificacion, contrasena);
+
+	    if (u == null) {
+	        return ResponseEntity.status(401).body("identificacion o contraseña incorrectos");
+	    }
+
 	    return ResponseEntity.ok(u);
 	}
 	
