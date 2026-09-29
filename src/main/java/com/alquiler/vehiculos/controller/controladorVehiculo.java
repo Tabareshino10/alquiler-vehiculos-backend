@@ -39,7 +39,7 @@ public class controladorVehiculo {
         return vehiculoRepo.findAll();
     }
 
-    @PostMapping("/buscarPlaca/")
+    @GetMapping("/buscarPlaca/")
     public Vehiculo buscarPlaca(@RequestParam String placa) {
         return vehiculoRepo.findById(placa).orElse(null);
     }
@@ -54,7 +54,7 @@ public class controladorVehiculo {
         return this.vehiculoRepo.findByIdTipoVehiculo(idTipoVehiculo);
     }
 
-    @PostMapping("/buscarEstado/")
+    @GetMapping("/buscarEstado/")
     public List<Vehiculo> buscarEstado(@RequestParam("estado") String estado) {
         return this.vehiculoRepo.findByEstado(estado);
     }

@@ -60,41 +60,37 @@ public class controladorAlquiler {
         return this.alquilerRepo.findByEstado(estado);
     }
 
-    // LÓGICA DE SOLICITUD: Asigna estado "pendiente de entrega" y pasa vehículo a "alquilado"
     @PostMapping("/guardar/")
     public ResponseEntity<?> guardarAlquiler(@RequestBody Alquiler a) {
-        // 1. Validar que enviaron la placa
+        
         if (a.getVehiculo() == null || a.getVehiculo().getPlaca() == null) {
             return ResponseEntity.badRequest().body("Debe indicar la placa del vehículo.");
         }
 
-        // 2. Buscar el vehículo en la base de datos
         Vehiculo v = this.vehiculoRepo.findById(a.getVehiculo().getPlaca()).orElse(null);
         if (v == null || !"disponible".equalsIgnoreCase(v.getEstado())) {
             return ResponseEntity.badRequest().body("El vehículo no está disponible.");
         }
 
-        // 3. Actualizar estado del vehículo a "alquilado"
         v.setEstado("alquilado");
         this.vehiculoRepo.save(v);
 
-        // 4. Crear el nuevo alquiler con 'new' como lo hicieron en clase
         Alquiler nuevoAlquiler = new Alquiler(
-        	    null,                   // idAlquiler (lo genera la BD)
-        	    a.getIdUsuario(),       // idUsuario
-        	    v,                      // vehiculo
-        	    a.getFechaInicio(),     // fechaInicio
-        	    a.getFechaEntregaP(),   // fechaEntregaP
-        	    null,                   // fechaEntregaR (aún no se ha devuelto)
-        	    a.getValorAlquiler(),   // valorAlquiler
-        	    "pendiente"  // estado
+        	    null,                  
+        	    a.getIdUsuario(),      
+        	    v,                    
+        	    a.getFechaInicio(),   
+        	    a.getFechaEntregaP(),
+        	    null,                   
+        	    a.getValorAlquiler(),
+        	    "pendiente"
         );
 
         
         Alquiler guardado = this.alquilerRepo.save(nuevoAlquiler);
         return ResponseEntity.ok(guardado);
     }
-    // NUEVO: Cancelar alquiler por idAlquiler (Cliente)
+    
     @PostMapping("/cancelar/")
     public ResponseEntity<?> cancelarAlquiler(@RequestParam("idAlquiler") Integer idAlquiler) {
         Alquiler a = alquilerRepo.findById(idAlquiler).orElse(null);
@@ -104,7 +100,6 @@ public class controladorAlquiler {
 
         a.setEstado("cancelado");
 
-        // Liberar el vehículo
         Vehiculo v = a.getVehiculo();
         if (v != null) {
             v.setEstado("disponible");
@@ -115,8 +110,8 @@ public class controladorAlquiler {
         return ResponseEntity.ok("Alquiler cancelado correctamente.");
     }
 
-    // NUEVO: Administrador entrega vehículo buscando por Placa
-    @PostMapping("/entregarPorPlaca/")
+
+    @PostMapping("/entregarPorPlaca")
     public ResponseEntity<?> entregarPorPlaca(@RequestParam("placa") String placa) {
         List<Alquiler> lista = alquilerRepo.findByVehiculoPlacaAndEstado(placa, "pendiente de entrega");
         if (lista.isEmpty()) {
@@ -130,7 +125,7 @@ public class controladorAlquiler {
         return ResponseEntity.ok("Estado del alquiler cambiado a entregado.");
     }
 
-    // NUEVO: Administrador recibe devolución buscando por idAlquiler
+
     @PostMapping("/devolver/")
     public ResponseEntity<?> registrarDevolucion(@RequestParam("idAlquiler") Integer idAlquiler) {
         Alquiler a = alquilerRepo.findById(idAlquiler).orElse(null);
@@ -141,13 +136,13 @@ public class controladorAlquiler {
         Date fechaReal = new Date();
         a.setFechaEntregaR(fechaReal);
 
-        // Cálculo de recargo si la fecha real supera la fecha previa estimada
+
         if (fechaReal.after(a.getFechaEntregaP())) {
             long milisegundos = fechaReal.getTime() - a.getFechaEntregaP().getTime();
             long diasAdicionales = TimeUnit.DAYS.convert(milisegundos, TimeUnit.MILLISECONDS);
 
             if (diasAdicionales > 0) {
-                BigDecimal tarifaDiaria = new BigDecimal("50000"); // Define o ajusta la tarifa por día
+                BigDecimal tarifaDiaria = new BigDecimal("50000"); 
                 BigDecimal recargo = tarifaDiaria.multiply(new BigDecimal(diasAdicionales));
                 a.setValorAlquiler(a.getValorAlquiler().add(recargo));
             }
@@ -155,7 +150,7 @@ public class controladorAlquiler {
 
         a.setEstado("finalizado");
 
-        // Liberar el vehículo a disponible
+
         Vehiculo v = a.getVehiculo();
         if (v != null) {
             v.setEstado("disponible");
