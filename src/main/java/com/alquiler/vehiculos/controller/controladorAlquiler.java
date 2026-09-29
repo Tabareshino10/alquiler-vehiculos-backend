@@ -165,4 +165,16 @@ public class controladorAlquiler {
         Alquiler alquilerFinalizado = alquilerRepo.save(a);
         return ResponseEntity.ok(alquilerFinalizado);
     }
+    
+ // NUEVO: Eliminar alquiler por idAlquiler
+    @PostMapping("/eliminar/")
+    public ResponseEntity<?> eliminarAlquiler(@RequestParam("idAlquiler") Integer idAlquiler) {
+        Alquiler a = alquilerRepo.findById(idAlquiler).orElse(null);
+        if (a == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        alquilerRepo.delete(a);
+        return ResponseEntity.ok("Alquiler eliminado correctamente.");
+    }
 }

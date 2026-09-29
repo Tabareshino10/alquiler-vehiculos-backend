@@ -72,7 +72,7 @@ public class controladorVehiculo {
     }
 
 	
-	@PostMapping("/eliminarVehiculo/")
+	@PostMapping("/eliminarVehiculo")
     public Optional<Vehiculo> eliminarVehiculo(@RequestBody String n){
     	Vehiculo v = this.vehiculoRepo.findById(n).get();
     	List<Alquiler> a = this.alquilerRepo.findByVehiculo(v);
