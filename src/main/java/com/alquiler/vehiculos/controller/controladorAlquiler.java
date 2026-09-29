@@ -118,13 +118,13 @@ public class controladorAlquiler {
     // NUEVO: Administrador entrega vehículo buscando por Placa
     @PostMapping("/entregarPorPlaca/")
     public ResponseEntity<?> entregarPorPlaca(@RequestParam("placa") String placa) {
-        List<Alquiler> lista = alquilerRepo.findByVehiculoPlacaAndEstado(placa, "pendiente de entrega");
+        List<Alquiler> lista = alquilerRepo.findByVehiculoPlacaAndEstado(placa, "pendiente");
         if (lista.isEmpty()) {
             return ResponseEntity.badRequest().body("No hay alquileres pendientes de entrega para esta placa.");
         }
 
         Alquiler a = lista.get(0);
-        a.setEstado("entregado");
+        a.setEstado("alquilado");
         alquilerRepo.save(a);
 
         return ResponseEntity.ok("Estado del alquiler cambiado a entregado.");
