@@ -15,12 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alquiler.vehiculos.entidad.Usuarios;
 import com.alquiler.vehiculos.repositorio.usuario;
 
-
-
-
-
-
-
 @RestController
 @RequestMapping("/usuarios/u")
 @CrossOrigin(origins = "http://localhost:4200/")
