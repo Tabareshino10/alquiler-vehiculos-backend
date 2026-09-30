@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,6 +39,13 @@ public class controladorAlquiler {
     @GetMapping("/listarTodo/")
     public List<Alquiler> mostrarTodos() {
         return alquilerRepo.findAll();
+    }
+    
+ 
+    @GetMapping("/listarPorUsuario/")
+    public ResponseEntity<List<Alquiler>> listarPorUsuario(@RequestParam("idUsuario") Integer identificacion) {
+        List<Alquiler> alquileresUsuario = alquilerRepo.findByIdUsuario(identificacion);
+        return ResponseEntity.ok(alquileresUsuario);
     }
 
     @PostMapping("/buscarId/")
@@ -111,7 +119,7 @@ public class controladorAlquiler {
     }
 
 
-    @PostMapping("/entregarPorPlaca")
+    @PostMapping("/entregarPorPlaca/")
     public ResponseEntity<?> entregarPorPlaca(@RequestParam("placa") String placa) {
         List<Alquiler> lista = alquilerRepo.findByVehiculoPlacaAndEstado(placa, "pendiente");
         if (lista.isEmpty()) {
@@ -127,17 +135,18 @@ public class controladorAlquiler {
 
 
     @PostMapping("/devolver/")
-    public ResponseEntity<?> registrarDevolucion(@RequestParam("idAlquiler") Integer idAlquiler) {
+    public ResponseEntity<?> registrarDevolucion(@RequestParam("idAlquiler") Integer idAlquiler, @RequestParam("fechaEntregaR") @DateTimeFormat(pattern = "yyyy-MM-dd") Date fechaReal) {
+        
         Alquiler a = alquilerRepo.findById(idAlquiler).orElse(null);
         if (a == null) {
             return ResponseEntity.notFound().build();
         }
 
-        Date fechaReal = new Date();
+        // Asignamos la fecha que llegó desde el frontend en lugar de new Date()
         a.setFechaEntregaR(fechaReal);
 
-
-        if (fechaReal.after(a.getFechaEntregaP())) {
+        // Cálculo de recargo si la fecha real supera la fecha previa estimada
+        if (a.getFechaEntregaP() != null && fechaReal.after(a.getFechaEntregaP())) {
             long milisegundos = fechaReal.getTime() - a.getFechaEntregaP().getTime();
             long diasAdicionales = TimeUnit.DAYS.convert(milisegundos, TimeUnit.MILLISECONDS);
 
@@ -149,7 +158,6 @@ public class controladorAlquiler {
         }
 
         a.setEstado("finalizado");
-
 
         Vehiculo v = a.getVehiculo();
         if (v != null) {
