@@ -65,7 +65,7 @@ public class controladorVehiculo {
         return ResponseEntity.ok(vehiculo);
     }
 
-    // NUEVO: Listar solo disponibles de un tipo seleccionado
+   
     @PostMapping("/buscarDisponiblesTipo/")
     public List<Vehiculo> buscarDisponiblesTipo(@RequestParam("idTipoVehiculo") String idTipoVehiculo) {
         return this.vehiculoRepo.findByIdTipoVehiculoAndEstado(idTipoVehiculo, "disponible");

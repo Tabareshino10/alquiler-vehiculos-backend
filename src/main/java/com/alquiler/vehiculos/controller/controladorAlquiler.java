@@ -142,10 +142,9 @@ public class controladorAlquiler {
             return ResponseEntity.notFound().build();
         }
 
-        // Asignamos la fecha que llegó desde el frontend en lugar de new Date()
+      
         a.setFechaEntregaR(fechaReal);
 
-        // Cálculo de recargo si la fecha real supera la fecha previa estimada
         if (a.getFechaEntregaP() != null && fechaReal.after(a.getFechaEntregaP())) {
             long milisegundos = fechaReal.getTime() - a.getFechaEntregaP().getTime();
             long diasAdicionales = TimeUnit.DAYS.convert(milisegundos, TimeUnit.MILLISECONDS);
@@ -169,7 +168,7 @@ public class controladorAlquiler {
         return ResponseEntity.ok(alquilerFinalizado);
     }
     
- // NUEVO: Eliminar alquiler por idAlquiler
+
     @PostMapping("/eliminar/")
     public ResponseEntity<?> eliminarAlquiler(@RequestParam("idAlquiler") Integer idAlquiler) {
         Alquiler a = alquilerRepo.findById(idAlquiler).orElse(null);
