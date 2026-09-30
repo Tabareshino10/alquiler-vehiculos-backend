@@ -24,7 +24,6 @@ public class Alquiler {
     @Column(name = "id_usuario", nullable = false)
     private Integer idUsuario;
 
-    // Relación Many-to-One con Vehículo usando la placa como FK
     @ManyToOne
     @JoinColumn(name = "placa", referencedColumnName = "placa", nullable = false)
     private Vehiculo vehiculo;
