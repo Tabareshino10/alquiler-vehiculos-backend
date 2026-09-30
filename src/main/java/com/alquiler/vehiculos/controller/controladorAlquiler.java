@@ -63,7 +63,7 @@ public class controladorAlquiler {
     // LÓGICA DE SOLICITUD: Asigna estado "pendiente de entrega" y pasa vehículo a "alquilado"
     @PostMapping("/guardar/")
     public ResponseEntity<?> guardarAlquiler(@RequestBody Alquiler a) {
-        // 1. Validar que enviaron la placa
+        
         if (a.getVehiculo() == null || a.getVehiculo().getPlaca() == null) {
             return ResponseEntity.badRequest().body("Debe indicar la placa del vehículo.");
         }
@@ -80,21 +80,21 @@ public class controladorAlquiler {
 
         // 4. Crear el nuevo alquiler con 'new' como lo hicieron en clase
         Alquiler nuevoAlquiler = new Alquiler(
-        	    null,                   // idAlquiler (lo genera la BD)
-        	    a.getIdUsuario(),       // idUsuario
-        	    v,                      // vehiculo
-        	    a.getFechaInicio(),     // fechaInicio
-        	    a.getFechaEntregaP(),   // fechaEntregaP
-        	    null,                   // fechaEntregaR (aún no se ha devuelto)
-        	    a.getValorAlquiler(),   // valorAlquiler
-        	    "pendiente"  // estado
+        	    null,                  
+        	    a.getIdUsuario(),      
+        	    v,                    
+        	    a.getFechaInicio(),   
+        	    a.getFechaEntregaP(),
+        	    null,                   
+        	    a.getValorAlquiler(),
+        	    "pendiente"
         );
 
         
         Alquiler guardado = this.alquilerRepo.save(nuevoAlquiler);
         return ResponseEntity.ok(guardado);
     }
-    // NUEVO: Cancelar alquiler por idAlquiler (Cliente)
+    
     @PostMapping("/cancelar/")
     public ResponseEntity<?> cancelarAlquiler(@RequestParam("idAlquiler") Integer idAlquiler) {
         Alquiler a = alquilerRepo.findById(idAlquiler).orElse(null);
@@ -147,7 +147,7 @@ public class controladorAlquiler {
             long diasAdicionales = TimeUnit.DAYS.convert(milisegundos, TimeUnit.MILLISECONDS);
 
             if (diasAdicionales > 0) {
-                BigDecimal tarifaDiaria = new BigDecimal("50000"); // Define o ajusta la tarifa por día
+                BigDecimal tarifaDiaria = new BigDecimal("50000"); 
                 BigDecimal recargo = tarifaDiaria.multiply(new BigDecimal(diasAdicionales));
                 a.setValorAlquiler(a.getValorAlquiler().add(recargo));
             }
