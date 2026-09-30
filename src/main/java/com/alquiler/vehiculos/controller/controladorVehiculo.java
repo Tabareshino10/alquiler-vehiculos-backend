@@ -20,7 +20,7 @@ import com.alquiler.vehiculos.repositorio.vehiculo;
 
 @RestController
 @RequestMapping("/vehiculos/v")
-@CrossOrigin(origins = "https://vercel.app")
+@CrossOrigin(origins = "*")
 public class controladorVehiculo {
 
     @Autowired
